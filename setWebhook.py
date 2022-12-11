@@ -4,9 +4,9 @@ import config
 
 url = "https://api.telegram.org/bot{token}/{method}".format(
     token=config.TOKEN,
-       # method="setWebhook"
+    # method="setWebhook"
      #  method="getWebhookinfo"
-      method="deleteWebhook"
+       method="deleteWebhook"
 )
 
 data = {"url": config.Function_url}

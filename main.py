@@ -65,6 +65,7 @@ def offer_to_translate(message):
 def take_a_scope(message):
     if message.text in text_samples.lang_list:
         resp = table.query(KeyConditionExpression=Key('id_chat').eq(f'{message.chat.id}'))
+
         last_item = resp['Items'][-1]
         response = table.put_item(
             Item={
@@ -146,7 +147,7 @@ def get_info(message):
                              initial_language=last_item.get('initial_language')))
 
 
-@bot.message_handler(commands=['choose_language']) # Выбрать язык для перевода
+@bot.message_handler(commands=['choose_language'])  # Выбрать язык для перевода
 def choose_language(message):
     offer_to_translate1(message)
 
@@ -197,13 +198,16 @@ def pick_initial_language(message):
 
 @bot.message_handler(content_types=['text'])
 def translate(message):
-    resp = table.query(KeyConditionExpression=Key('id_chat').eq(f'{message.chat.id}'))
-
-    last_item = resp['Items'][-1]
-
+    try:
+        resp = table.query(KeyConditionExpression=Key('id_chat').eq(f'{message.chat.id}'))
+        last_item = resp['Items'][-1]
+    except:
+        bot.send_message(message.chat.id, 'Видимо база данных бота была обновлена.\n'
+                                          'Возможно данные бота о вашем аккаунте утеряны.\n'
+                                          'Пожалуйста, начните процедуру регистрации в боте заново, команда: /start')
     if last_item.get('chosen_language') is None:
-        bot.send_message(message.chat.id, 'Пожалуйста выбери язык для перевода на русский.\n'
-                                          'Для этого пропиши команду:  /menu')
+        bot.send_message(message.chat.id, 'Пожалуйста выбери язык для перевода.\n'
+                                          'Для этого пропиши команду:  /menu или /choose_language')
     elif last_item.get('initial_language') is None:
         bot.send_message(message.chat.id, 'Пожалуйста выбери язык на который переводят.\n'
                                           'Для этого пропиши команду: /menu-initial')
